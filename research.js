@@ -150,7 +150,7 @@ var monthNames = [
 function process_talks() {
     $('<h2 id="heading-talks">Talks</h2>').insertBefore(script_tag);
     $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
-    +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()'>Public</LABEL>"
+    +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()' style='margin-left: 15px'>Public</LABEL>"
     +"<DIV id='j-stats'></DIV></P>").insertBefore(script_tag);
     $('#j-stats').css('margin-bottom','10px');
 

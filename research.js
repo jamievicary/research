@@ -94,20 +94,43 @@ function research_2() {
     });
 }
 
+var show_more = false;
 function process_updates() {
     var now = new Date();
 
-    $('<h3 id="heading-future">The future</h3>').insertBefore(script_tag);
+    $('<h2 id="heading-future">The future</h2>').insertBefore(script_tag);
     $ul_future = $('<ul id="ul-future"></ul>').insertBefore(script_tag);
-    $('<h3 id="heading-past">The past</h3>').insertBefore(script_tag);
+    $('<h2 id="heading-past">The past</h2>').insertBefore(script_tag);
     $ul_past = $('<ul id="ul-past"></ul>').insertBefore(script_tag);
+    $lessmore = $('<button id="button-lessmore" type="button">Show more...</button>').insertBefore(script_tag);
+    $lessmore.click(function() {
+        show_more = !show_more;
+        var $old_news = $('li.old');
+        if (show_more) {
+            $lessmore.html("Show less...");
+            $old_news.slideDown();
+        } else {
+            $lessmore.html("Show more...");
+            $old_news.slideUp();
+        }
+    })
 
+    var now = new Date;
     for (var i = 0; i < data.updates.length; i++) {
         var update = data.updates[i];
+        var update_date = new Date(update.date);
         var target = (new Date(update.date) < now ? $ul_past : $ul_future)
         var $li = $('<li><b>' + update.date + '.</b> ' + update.text + '</li>').appendTo(target);
         $li[0].date = new Date(update.date);
+        if (update_date < now) {
+            if (now - update_date > 1000 * 60 * 60 * 24 * 365) {
+                $li.addClass('old');
+            }
+        }
     }
+    
+    // Hide old news
+    $('li.old').hide();
 
     $('#ul-future>li').sort(function(a, b) {
         return b.date - a.date;

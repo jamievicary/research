@@ -89,6 +89,7 @@ function research_2() {
             data[ranges[i].toLowerCase()] = process_spreadsheet_data(results[i].values);
         }
         process_updates();
+        process_talks();
     }, function(reason) {
         console.error('error: ' + reason.result.error.message);
     });
@@ -138,6 +139,52 @@ function process_updates() {
     $('#ul-past>li').sort(function(a, b) {
         return b.date - a.date;
     }).detach().appendTo('#ul-past');
+}
+
+var monthNames = [
+    "January", "February", "March",
+    "April", "May", "June", "July",
+    "August", "September", "October",
+    "November", "December"
+  ];
+function process_talks() {
+    $('<h2 id="heading-talks">Talks</h2>').insertBefore(script_tag);
+    $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
+    +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()'>Public</LABEL>"
+    +"<DIV id='j-stats'></DIV></P>").insertBefore(script_tag);
+    $('#j-stats').css('margin-bottom','10px');
+
+    for (var i = 0; i < data.talks.length; i++) {
+        var talk = data.talks[i];
+        var date = new Date(talk.date);
+        div_html = "<div class='jamietalk"
+            + (talk.invited ? " invited" : "")
+            + (talk.public ? " public" : "")
+            + "'> [" + (i+1) + "] "
+            + (talk.invited ? "(invited) " : "")
+            + (talk.public ? "(public) " : "")
+            + monthNames[date.getMonth()] + " " + date.getFullYear()
+            + ". ''" + talk.title + "'', "
+            + (talk.url == "" ? talk.event : "<a href='" + talk.url + "'>" + talk.event + '</a>')
+            + ", " + talk.location + ". "
+            + talk.notes
+            + "</div>";
+        $div = $(div_html).insertAfter($('#j-stats'));
+        $div.index = i;        
+    }
+
+
+    filter_talks();
+}
+
+function filter_talks() {
+    var all = $('div.jamietalk');
+    var sel = $();
+    if ($('#j-checkbox-invited').prop('checked')) sel=sel.add($('div.jamietalk.invited'));
+    if ($('#j-checkbox-public').prop('checked')) sel=sel.add($('div.jamietalk.public'));
+    sel.slideDown();
+    all.not(sel).slideUp();
+    $('#j-stats').text(sel.length + ' talks selected.');  
 }
 
 function process_spreadsheet_data(response) {

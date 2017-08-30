@@ -167,7 +167,7 @@ function process_talks() {
             + ". ''" + talk.title + "'', "
             + (talk.url == "" ? talk.event : "<a href='" + talk.url + "'>" + talk.event + '</a>')
             + ", " + talk.location + ". "
-            + talk.notes
+            + (talk.notes || "")
             + "</div>";
         $div = $(div_html).insertAfter($('#j-stats'));
         $div.index = i;        

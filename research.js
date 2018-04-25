@@ -8,91 +8,14 @@ var spreadsheet_id = '1fZQS-MFG6Dvk7TtqQOjC6-F7RLXZmQLlDUQ72cSgEfw';
 
 var data = {};
 
-var scripts = [{
-    'src': 'https://apis.google.com/js/api.js',
-    'skip_function': function() {
-        return window.jQuery;
-    }
-}, {
-    'src': 'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'
-}];
+var scripts = [{'src': 'https://apis.google.com/js/api.js','skip_function': function() {return window.jQuery;}}, {'src': 'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'}];
 var loaded = 0;
 var t = null;
 
-function load_scripts() {
-    var load_time = performance.now();
-    for (var i = 0; i < scripts.length; i++) {
-        if (scripts[i].skip_function) {
-            if (scripts[i].skip_function()) continue;
-        }
-        scripts[i].script_element = document.createElement("script");
-        scripts[i].loaded = false;
-        var elt = scripts[i].script_element;
-        elt.src = scripts[i].src;
-        elt.type = 'text/javascript';
-        elt.index = i;
-        elt.onload = function() {
-            scripts[this.index].loaded = true;
-            console.log('Dynamically loaded script ' + scripts[this.index].src + ' (' + Math.floor(performance.now() - load_time) + 'ms)');
-            for (var j = 0; j < scripts.length; j++) {
-                if (!scripts[j].loaded)
-                    return;
-            }
-            research_1();
-        }
-        ;
-        document.getElementsByTagName("head")[0].appendChild(elt);
-    }
-}
-load_scripts();
-
-// Authorize Google Sheets API object
-var gapi_load_time;
-function research_1() {
-
-    // Authorize the API object
-    gapi_load_time = performance.now();
-    gapi.load('client:auth2', function() {
-        gapi.client.init({
-            'apiKey': api_key,
-            'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4']
-        }).then(research_2);
-    });
-}
-
-// Get data from the spreadsheet
-var script_tag;
-function research_2() {
-
-    // Find the script tag
-    script_tag = ($('script').filter(function(index, value) {
-        return value.src.includes('research.js')
-    }));
-
-    console.log('Authorized Google API object (' + Math.floor(performance.now() - gapi_load_time) + 'ms)');
-
-    var script_element = document.getElementById('script-programme');
-
-    var ranges = ["Papers", "Talks", "Updates"];
-    var params = {
-        spreadsheetId: spreadsheet_id,
-        ranges: ranges,
-        valueRenderOption: 'UNFORMATTED_VALUE',
-        dateTimeRenderOption: 'FORMATTED_STRING',
-    };
-    var request = gapi.client.sheets.spreadsheets.values.batchGet(params);
-    var data_request_time = performance.now();
-    request.then(function(response) {
-        console.log('Received spreadsheet data (' + Math.floor(performance.now() - data_request_time) + 'ms)');
-        var results = response.result.valueRanges;
-        for (var i = 0; i < results.length; i++) {
-            data[ranges[i].toLowerCase()] = process_spreadsheet_data(results[i].values);
-        }
-        process_updates();
-        process_talks();
-    }, function(reason) {
-        console.error('error: ' + reason.result.error.message);
-    });
+function render_page() {
+    process_updates();
+    process_papers();
+    process_talks();
 }
 
 var show_more = false;
@@ -141,12 +64,50 @@ function process_updates() {
     }).detach().appendTo('#ul-past');
 }
 
-var monthNames = [
-    "January", "February", "March",
-    "April", "May", "June", "July",
-    "August", "September", "October",
-    "November", "December"
-  ];
+function process_papers() {
+    $('<h2 id="heading-papers">Papers</h2>').insertBefore(script_tag);
+
+    for (var i = data.papers.length - 1; i >= 0; i--) {
+        var paper = data.papers[i];
+        var paper_html = '<div class="jamiepaper">'
+            + '[' + (data.papers.length - i) + '] '
+            + paper.authors + ' (' + paper.year + '). '
+            + '"' + paper.title + '". '
+            + format_journal(paper)
+            + "</div>";
+        paper_html = insert_person_links(paper_html);
+        $div = $(paper_html).insertAfter($('#heading-papers'));
+    }
+}
+
+function format_journal(paper) {
+    var ref = '';
+    if (paper.booktitle) {
+        ref += 'In <i>' + paper.booktitle + '</i>, '
+    }
+    if (paper.journal) {
+        ref += paper.journal + ' <b>' + paper.volume + '</b> ';
+        if (paper.issue) ref += ' (' + paper.issue + ')';
+        if (paper.pagerange) ref += ', ' + paper.pagerange
+    }
+    if (paper.pages && !(paper.journal && paper.pagerange)) {
+        ref += (paper.journal ? ', ' : '') + paper.pages + ' pages';
+    }
+    ref += (ref ? '.' : '');
+    var link_html = '';
+    if (paper.arxiv) link_html = '<a href="http://arxiv.org/abs/' + paper.arxiv + '">arXiv:' + paper.arxiv + '</a>'
+    if (paper.doi) link_html += (paper.arxiv ? ', ' : '')
+        + '<a href="http://doi.org/' + paper.doi + '">doi:' + paper.doi + '</a>';
+    if (link_html) ref += (ref ? ' ' : '') + link_html + '.';
+    return ref;
+}
+
+function insert_person_links(str) {
+    return str;
+}
+
+
+var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function process_talks() {
     $('<h2 id="heading-talks">Talks</h2>').insertBefore(script_tag);
     $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
@@ -172,10 +133,87 @@ function process_talks() {
         $div = $(div_html).insertAfter($('#j-stats'));
         $div.index = i;        
     }
-
-
     filter_talks();
 }
+
+
+function load_scripts() {
+    var load_time = performance.now();
+    for (var i = 0; i < scripts.length; i++) {
+        if (scripts[i].skip_function) {
+            if (scripts[i].skip_function()) continue;
+        }
+        scripts[i].script_element = document.createElement("script");
+        scripts[i].loaded = false;
+        var elt = scripts[i].script_element;
+        elt.src = scripts[i].src;
+        elt.type = 'text/javascript';
+        elt.index = i;
+        elt.onload = function() {
+            scripts[this.index].loaded = true;
+            console.log('Dynamically loaded script ' + scripts[this.index].src + ' (' + Math.floor(performance.now() - load_time) + 'ms)');
+            for (var j = 0; j < scripts.length; j++) {
+                if (!scripts[j].loaded)
+                    return;
+            }
+            research_1();
+        }
+        ;
+        document.getElementsByTagName("head")[0].appendChild(elt);
+    }
+}
+load_scripts();
+
+// Authorize Google Sheets API object
+var gapi_load_time;
+function research_1() {
+
+    // Authorize the API object
+    gapi_load_time = performance.now();
+    gapi.load('client:auth2', function() {
+        gapi.client.init({
+            'apiKey': api_key,
+            'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4']
+        }).then(get_research_data);
+    });
+}
+
+// Get data from the spreadsheet
+var script_tag;
+function get_research_data() {
+
+    // Find the script tag
+    script_tag = ($('script').filter(function(index, value) {
+        return value.src.includes('research.js')
+    }));
+
+    console.log('Authorized Google API object (' + Math.floor(performance.now() - gapi_load_time) + 'ms)');
+
+    var script_element = document.getElementById('script-programme');
+
+    var ranges = ["Papers", "Talks", "Updates", "People"];
+    var params = {
+        spreadsheetId: spreadsheet_id,
+        ranges: ranges,
+        valueRenderOption: 'UNFORMATTED_VALUE',
+        dateTimeRenderOption: 'FORMATTED_STRING',
+    };
+    var request = gapi.client.sheets.spreadsheets.values.batchGet(params);
+    var data_request_time = performance.now();
+    request.then(function(response) {
+        console.log('Received spreadsheet data (' + Math.floor(performance.now() - data_request_time) + 'ms)');
+        var results = response.result.valueRanges;
+        for (var i = 0; i < results.length; i++) {
+            data[ranges[i].toLowerCase()] = process_spreadsheet_data(results[i].values);
+        }
+        render_page();
+    }, function(reason) {
+        console.error('error: ' + reason.result.error.message);
+    });
+}
+
+
+
 
 function filter_talks() {
     var all = $('div.jamietalk');

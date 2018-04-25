@@ -44,7 +44,7 @@ function process_updates() {
         var update = data.updates[i];
         var update_date = new Date(update.date);
         var target = (new Date(update.date) < now ? $ul_past : $ul_future)
-        var $li = $('<li><b>' + update.date + '.</b> ' + update.text + '</li>').appendTo(target);
+        var $li = $('<li><b>' + update.date + '.</b> ' + insert_person_links(update.text) + '</li>').appendTo(target);
         $li[0].date = new Date(update.date);
         if (update_date < now) {
             if (now - update_date > 1000 * 60 * 60 * 24 * 365) {
@@ -97,12 +97,17 @@ function format_journal(paper) {
     var link_html = '';
     if (paper.arxiv) link_html = '<a href="http://arxiv.org/abs/' + paper.arxiv + '">arXiv:' + paper.arxiv + '</a>'
     if (paper.doi) link_html += (paper.arxiv ? ', ' : '')
-        + '<a href="http://doi.org/' + paper.doi + '">doi:' + paper.doi + '</a>';
+        + '<a href="http://doi.org/' + paper.doi.trim() + '">doi:' + paper.doi.trim() + '</a>';
     if (link_html) ref += (ref ? ' ' : '') + link_html + '.';
     return ref;
 }
 
 function insert_person_links(str) {
+    for (var i=0; i<data.people.length; i++) {
+        var person = data.people[i];
+        var link = '<a href="' + person.url + '">' + person.name + '</a>';
+        str = str.replace(person.name, link);
+    }
     return str;
 }
 

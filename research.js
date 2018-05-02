@@ -149,7 +149,7 @@ function load_scripts() {
         if (script.skip) script.loaded = script.skip();
         else script.loaded = false;
         if (script.loaded) continue;
-        scripts.script_element = document.createElement("script");
+        script.script_element = document.createElement("script");
         var elt = scripts[i].script_element;
         elt.src = scripts[i].src;
         elt.type = 'text/javascript';

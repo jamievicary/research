@@ -146,10 +146,10 @@ function load_scripts() {
     var load_time = performance.now();
     for (var i = 0; i < scripts.length; i++) {
         var script = scripts[i];
-        script.loaded = script.skip();
+        if (script.skip) script.loaded = script.skip();
+        else script.loaded = false;
         if (script.loaded) continue;
-        scripts[i].script_element = document.createElement("script");
-        scripts[i].loaded = false;
+        scripts.script_element = document.createElement("script");
         var elt = scripts[i].script_element;
         elt.src = scripts[i].src;
         elt.type = 'text/javascript';

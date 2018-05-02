@@ -12,7 +12,13 @@ var scripts = [{'src': 'https://apis.google.com/js/api.js','skip': function() {r
 var loaded = 0;
 var t = null;
 
+var h;
 function render_page() {
+    if (document.location.href.indexOf('cs.ox') >= 0) {
+        h = 'h2';
+    } else if (document.location.href.indexOf('cs.bham') >= 0) {
+        h = 'h1';
+    } else h = 'h1';
     process_updates();
     process_papers();
     process_talks();
@@ -22,9 +28,9 @@ var show_more = false;
 function process_updates() {
     var now = new Date();
 
-    $('<h2 id="heading-future">The future</h2>').insertBefore(script_tag);
+    $('<' + h + ' id="heading-future">The future</' + h + '>').insertBefore(script_tag);
     $ul_future = $('<ul id="ul-future"></ul>').insertBefore(script_tag);
-    $('<h2 id="heading-past">The past</h2>').insertBefore(script_tag);
+    $('<' + h + ' id="heading-past">The past</' + h + '>').insertBefore(script_tag);
     $ul_past = $('<ul id="ul-past"></ul>').insertBefore(script_tag);
     $lessmore = $('<button id="button-lessmore" type="button">Show more...</button>').insertBefore(script_tag);
     $lessmore.click(function() {
@@ -65,7 +71,7 @@ function process_updates() {
 }
 
 function process_papers() {
-    $('<h2 id="heading-papers">Papers</h2>').insertBefore(script_tag);
+    $('<' + h + ' id="heading-papers">Papers</' + h + '>').insertBefore(script_tag);
 
     for (var i = data.papers.length - 1; i >= 0; i--) {
         var paper = data.papers[i];
@@ -114,7 +120,7 @@ function insert_person_links(str) {
 
 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function process_talks() {
-    $('<h2 id="heading-talks">Talks</h2>').insertBefore(script_tag);
+    $('<' + h + ' id="heading-talks">Talks</' + h + '>').insertBefore(script_tag);
     $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
     +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()' style='margin-left: 15px'>Public</LABEL>"
     +"<DIV id='j-stats'></DIV></P>").insertBefore(script_tag);

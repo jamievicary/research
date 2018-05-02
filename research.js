@@ -50,7 +50,7 @@ function process_updates() {
         var update = data.updates[i];
         var update_date = new Date(update.date);
         var target = (new Date(update.date) < now ? $ul_past : $ul_future)
-        var $li = $('<li><b>' + update.date + '.</b> ' + insert_person_links(update.text) + '</li>').appendTo(target);
+        var $li = $('<li class="jamieupdate"><b>' + update.date + '.</b> ' + insert_person_links(update.text) + '</li>').appendTo(target);
         $li[0].date = new Date(update.date);
         if (update_date < now) {
             if (now - update_date > 1000 * 60 * 60 * 24 * 365) {

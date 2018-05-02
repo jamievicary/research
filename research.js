@@ -28,9 +28,9 @@ var show_more = false;
 function process_updates() {
     var now = new Date();
 
-    $('<' + h + ' id="heading-future">The future</' + h + '>').insertBefore(script_tag);
+    $('<' + h + ' class="jamie" id="heading-future">The future</' + h + '>').insertBefore(script_tag);
     $ul_future = $('<ul id="ul-future"></ul>').insertBefore(script_tag);
-    $('<' + h + ' id="heading-past">The past</' + h + '>').insertBefore(script_tag);
+    $('<' + h + ' class="jamie" id="heading-past">The past</' + h + '>').insertBefore(script_tag);
     $ul_past = $('<ul id="ul-past"></ul>').insertBefore(script_tag);
     $lessmore = $('<button id="button-lessmore" type="button">Show more...</button>').insertBefore(script_tag);
     $lessmore.click(function() {
@@ -71,8 +71,8 @@ function process_updates() {
 }
 
 function process_papers() {
-    $('<' + h + ' id="heading-papers">Papers</' + h + '>').insertBefore(script_tag);
-
+    $('<' + h + ' class="jamie" id="heading-papers">Papers</' + h + '>').insertBefore(script_tag);
+    
     for (var i = data.papers.length - 1; i >= 0; i--) {
         var paper = data.papers[i];
         var paper_html = '<div class="jamiepaper">'
@@ -120,7 +120,7 @@ function insert_person_links(str) {
 
 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function process_talks() {
-    $('<' + h + ' id="heading-talks">Talks</' + h + '>').insertBefore(script_tag);
+    $('<' + h + ' class="jamie" id="heading-talks">Talks</' + h + '>').insertBefore(script_tag);
     $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
     +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()' style='margin-left: 15px'>Public</LABEL>"
     +"<DIV id='j-stats'></DIV></P>").insertBefore(script_tag);

@@ -146,7 +146,8 @@ function load_scripts() {
     var load_time = performance.now();
     for (var i = 0; i < scripts.length; i++) {
         var script = scripts[i];
-        if (script.skip) script.skip = script.skip();
+        script.loaded = script.skip();
+        if (script.loaded) continue;
         scripts[i].script_element = document.createElement("script");
         scripts[i].loaded = false;
         var elt = scripts[i].script_element;
@@ -157,7 +158,7 @@ function load_scripts() {
             scripts[this.index].loaded = true;
             console.log('Dynamically loaded script ' + scripts[this.index].src + ' (' + Math.floor(performance.now() - load_time) + 'ms)');
             for (var j = 0; j < scripts.length; j++) {
-                if (!scripts[j].skip && !scripts[j].loaded) return;
+                if (!scripts[j].loaded) return;
             }
             research_1();
         }

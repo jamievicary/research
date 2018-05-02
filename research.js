@@ -72,7 +72,7 @@ function process_updates() {
 
 function process_papers() {
     $('<' + h + ' class="jamie" id="heading-papers">Papers</' + h + '>').insertBefore(script_tag);
-    
+
     for (var i = data.papers.length - 1; i >= 0; i--) {
         var paper = data.papers[i];
         var paper_html = '<div class="jamiepaper">'
@@ -121,30 +121,31 @@ function insert_person_links(str) {
 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function process_talks() {
     $('<' + h + ' class="jamie" id="heading-talks">Talks</' + h + '>').insertBefore(script_tag);
-    $("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
+
+    /*$("<P><LABEL><INPUT id='j-checkbox-invited' type='checkbox' value='true' onclick='filter_talks()'>Invited </LABEL>"
     +"<LABEL><INPUT id='j-checkbox-public' type='checkbox' value='true' onclick='filter_talks()' style='margin-left: 15px'>Public</LABEL>"
     +"<DIV id='j-stats'></DIV></P>").insertBefore(script_tag);
     $('#j-stats').css('margin-bottom','10px');
+    */
 
     for (var i = 0; i < data.talks.length; i++) {
         var talk = data.talks[i];
         var date = new Date(talk.date);
         div_html = "<div class='jamietalk"
-            + (talk.invited ? " invited" : "")
-            + (talk.public ? " public" : "")
             + "'> [" + (i+1) + "] "
-            + (talk.invited ? "(invited) " : "")
-            + (talk.public ? "(public) " : "")
             + monthNames[date.getMonth()] + " " + date.getFullYear()
             + ". ''" + talk.title + "'', "
             + (talk.url == "" ? talk.event : "<a href='" + talk.url + "'>" + talk.event + '</a>')
-            + ", " + talk.location + ". "
+            + (talk.location ? ", " + talk.location : '')
+            + ". "
             + (talk.notes || "")
+            + (talk.invited ? " (invited)" : "")
+            + (talk.public ? " (public)" : "")
             + "</div>";
-        $div = $(div_html).insertAfter($('#j-stats'));
+        $div = $(div_html).insertAfter($('#heading-talks'));
         $div.index = i;        
     }
-    filter_talks();
+    //filter_talks();
 }
 
 

@@ -177,7 +177,7 @@ function research_1() {
         return value.src.includes('research.js')
     }));
 
-    if (jv_raw_data) {
+    if (typeof jv_raw_data !== 'undefined') {
         process_research_data(jv_raw_data);
         return;
     }

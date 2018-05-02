@@ -8,7 +8,7 @@ var spreadsheet_id = '1fZQS-MFG6Dvk7TtqQOjC6-F7RLXZmQLlDUQ72cSgEfw';
 
 var data = {};
 
-var scripts = [{'src': 'https://apis.google.com/js/api.js','skip_function': function() {return window.jQuery;}}, {'src': 'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'}];
+var scripts = [{'src': 'https://apis.google.com/js/api.js','skip': function() {return window.jQuery;}}, {'src': 'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'}];
 var loaded = 0;
 var t = null;
 
@@ -145,9 +145,8 @@ function process_talks() {
 function load_scripts() {
     var load_time = performance.now();
     for (var i = 0; i < scripts.length; i++) {
-        if (scripts[i].skip_function) {
-            if (scripts[i].skip_function()) continue;
-        }
+        var script = scripts[i];
+        if (script.skip) script.skip = script.skip();
         scripts[i].script_element = document.createElement("script");
         scripts[i].loaded = false;
         var elt = scripts[i].script_element;
@@ -158,8 +157,7 @@ function load_scripts() {
             scripts[this.index].loaded = true;
             console.log('Dynamically loaded script ' + scripts[this.index].src + ' (' + Math.floor(performance.now() - load_time) + 'ms)');
             for (var j = 0; j < scripts.length; j++) {
-                if (!scripts[j].loaded)
-                    return;
+                if (!scripts[j].skip && !scripts[j].loaded) return;
             }
             research_1();
         }

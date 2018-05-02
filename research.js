@@ -171,6 +171,16 @@ load_scripts();
 var gapi_load_time;
 function research_1() {
 
+    // Find the script tag
+    script_tag = ($('script').filter(function(index, value) {
+        return value.src.includes('research.js')
+    }));
+
+    if (jv_raw_data) {
+        process_research_data(jv_raw_data);
+        return;
+    }
+
     // Authorize the API object
     gapi_load_time = performance.now();
     gapi.load('client:auth2', function() {
@@ -183,18 +193,13 @@ function research_1() {
 
 // Get data from the spreadsheet
 var script_tag;
+var ranges = ["Papers", "Talks", "Updates", "People"];
 function get_research_data() {
-
-    // Find the script tag
-    script_tag = ($('script').filter(function(index, value) {
-        return value.src.includes('research.js')
-    }));
 
     console.log('Authorized Google API object (' + Math.floor(performance.now() - gapi_load_time) + 'ms)');
 
     var script_element = document.getElementById('script-programme');
 
-    var ranges = ["Papers", "Talks", "Updates", "People"];
     var params = {
         spreadsheetId: spreadsheet_id,
         ranges: ranges,
@@ -205,17 +210,19 @@ function get_research_data() {
     var data_request_time = performance.now();
     request.then(function(response) {
         console.log('Received spreadsheet data (' + Math.floor(performance.now() - data_request_time) + 'ms)');
-        var results = response.result.valueRanges;
-        for (var i = 0; i < results.length; i++) {
-            data[ranges[i].toLowerCase()] = process_spreadsheet_data(results[i].values);
-        }
-        render_page();
+        process_research_data(response.result);
     }, function(reason) {
         console.error('error: ' + reason.result.error.message);
     });
 }
 
-
+function process_research_data(raw_data) {
+    var results = raw_data.valueRanges;
+    for (var i = 0; i < results.length; i++) {
+        data[ranges[i].toLowerCase()] = process_spreadsheet_data(results[i].values);
+    }
+    render_page();
+}
 
 
 function filter_talks() {
